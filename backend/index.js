@@ -25,17 +25,18 @@ const options = {
 
 
 
-
+  const profileUpdateCrud = require('./profileUpdate/crud')
   const testCrud = require('./test/crud')
   const authCrud = require('./auth/crud')
   const notifyCrud = require('./notify/crud')
 app.use('/app',
     testCrud,
     authCrud,
-    notifyCrud
+    notifyCrud,
+    profileUpdateCrud
   )
 
   const port = 3000;
-  const server = app.listen(port, () => {
+  app.listen(port, () => {
     console.log(`Server started on port ${port}`);
   });

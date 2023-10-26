@@ -3,98 +3,89 @@
     view="lHr LpR fFr">
 
     <q-header
+      :style="{
+        'background':this.store.defaultMainColor
+      }"
       v-if="this.$route.path !== '/login'"
-      elevated class="bg-grey-8 text-white" height-hint="98">
+      elevated class="text-white" height-hint="98">
       <q-toolbar>
-        <q-btn dense flat round icon="menu" @click="this.leftDrawerOpen =! this.leftDrawerOpen" />
+        <q-btn
+          v-if="!this.leftDrawerOpen"
+          dense flat color="white"
+          icon="menu_open"
+          @click="this.leftDrawerOpen =! this.leftDrawerOpen" />
 
         <q-toolbar-title>
-          <q-avatar>
-            <!-- <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg"> -->
+          <q-avatar v-if="!this.leftDrawerOpen">
+            <img :src="myLogo" alt="">
           </q-avatar>
-
         </q-toolbar-title>
-
-        <q-btn dense flat round icon="menu" @click="this.rightDrawerOpen =! this.rightDrawerOpen" />
-        <!-- <q-btn dense flat round icon="logout" v-on:click="logoutButton"></q-btn> -->
+        <q-btn dense flat round icon="logout" v-on:click="logoutButton"></q-btn>
       </q-toolbar>
     </q-header>
 
     <q-drawer
-        v-model="this.leftDrawerOpen" v-if="this.leftDrawerOpen"
-        :width="300"
-        :breakpoint="400"
+      elevated
+      :style="{
+        'background':this.store.defaultMainColor
+      }"
+      class=""
+      v-model="this.leftDrawerOpen" v-if="this.leftDrawerOpen"
+      :width="300"
+      :breakpoint="400"
       >
-        <q-scroll-area style="height: calc(100% - 150px); margin-top: 150px; border-right: 1px solid #ddd">
-          <q-list padding>
-            <q-item
-              v-on:click="goSelectedRoute(data)"
-              :class="newClassForSelectedOption(data)"
-              v-for="(data,key) in this.leftBarOptions" :key="key"
-              clickable v-ripple>
-              <q-item-section avatar>
-                <q-icon :name="data.icon" />
-              </q-item-section>
-
-              <q-item-section>
-                {{ data.label }}
-              </q-item-section>
-            </q-item>
-            <q-item
-              class="absolute-bottom bg-grey-8 text-white"
-              v-on:click="this.logoutButton()"
-              clickable v-ripple
-            >
-              <q-item-section avatar>
-                <q-icon name="logout"></q-icon>
-              </q-item-section>
-              <q-item-section>
-                Logout
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-scroll-area>
-
-        <q-img class="absolute-top" src="https://cdn.quasar.dev/img/material.png" style="height: 150px">
-          <div class="absolute-bottom bg-transparent">
-            <q-avatar size="56px" class="q-mb-sm">
-              <img
-                style="object-fit:cover;"
-                :src="this.store.defaultPhoto">
-            </q-avatar>
-            <div class="text-weight-bold" v-if="!this.store.checkForAnonOrNot()">
-              {{ this.store.firebaseData.displayName ?? '' }}
-            </div>
-            <div v-if="!this.store.checkForAnonOrNot()">@{{ this.store.firebaseData.email ?? '' }}</div>
-          </div>
-        </q-img>
-      </q-drawer>
-
-    <q-drawer v-if="this.rightDrawerOpen" v-model="this.rightDrawerOpen" side="right" elevated>
-      <!-- drawer content -->
+      <div class="row">
+        <q-avatar class="q-pa-sm">
+          <img
+            style="object-fit:cover;"
+            :src="myLogo" alt="">
+        </q-avatar>
+        <q-space></q-space>
+        <q-btn
+          v-on:Click="this.leftDrawerOpen = false"
+          class="q-pa-md"
+          icon="cancel" flat color="white"></q-btn>
+      </div>
+      <q-list padding>
+        <q-item
+          :class="this.checkCurrentRoute(data) === true ? 'bg-grey-2 text-dark' : 'text-white'"
+          flat
+          v-on:click="goSelectedRoute(data)"
+          v-for="(data,key) in this.leftBarOptions" :key="key"
+          clickable v-ripple>
+          <q-item-section avatar>
+            <q-icon :name="data.icon" />
+          </q-item-section>
+          <q-item-section>
+            {{ data.label }}
+          </q-item-section>
+          <q-item-section avatar>
+            <q-icon
+              :name="this.checkCurrentRoute(data) === true ? 'arrow_right' : 'arrow_left'"
+            ></q-icon>
+          </q-item-section>
+        </q-item>
+      </q-list>
+      <q-card
+        class="absolute-bottom bg-transparent text-white text-center"
+        flat>
+        <q-item>
+          <q-item-section class="text-caption">
+            @Copyrights Code&Design
+          </q-item-section>
+        </q-item>
+      </q-card>
     </q-drawer>
-
     <q-page-container>
       <router-view />
     </q-page-container>
-
-    <q-footer
-      v-if="this.$route.path !== '/login'"
-      bordered class="bg-grey-8 text-white">
-      <q-toolbar>
-        <q-toolbar-title>
-<!--           <q-avatar>
-            <img src="https://cdn.quasar.dev/logo-v2/svg/logo-mono-white.svg">
-          </q-avatar>
-          <div>Title</div> -->
-        </q-toolbar-title>
-      </q-toolbar>
-    </q-footer>
-
   </q-layout>
 </template>
 
+
+
 <script>
+import myLogo from '../images/myWhiteLogo.png'
 import { getAuth, signOut } from "firebase/auth";
 import { ref } from 'vue'
 import { useCounterStore } from 'src/stores/store'
@@ -102,11 +93,13 @@ export default {
   setup () {
     const store = useCounterStore()
     return {
-      store
+      store,
+      myLogo
     }
   },
   data:function(){
     return{
+      miniState:true,
       leftDrawerOpen:false,
       rightDrawerOpen:false,
       leftBarOptions:[
@@ -117,21 +110,6 @@ export default {
     }
   },
   methods:{
-    checkForImage(newVal){
-      const check = newVal.hasOwnProperty('photoURL')
-      if(check === true){
-        const image = newVal.photoURL
-        this.store.defaultPhoto = image
-      }
-    },
-    newClassForSelectedOption(data){
-      const check = this.$route.name === data.name ? true : false
-      if(check){
-        return 'bg-grey-8 text-white'
-      }else{
-        return 'text-grey-8'
-      }
-    },
     goSelectedRoute(data){
       if(!this.store.checkForAnonOrNot() && data.id !== 2 && data.id !== 3){
         console.log('data.id not 3 ')
@@ -156,7 +134,7 @@ export default {
         this.$q.notify({
           type:'negative',
           icon:'info',
-          message:'Anon Users Cant Reach Profile Page ! ',
+          message:'Anonymous Users Cannot Access Profile Pages.',
           position:'bottom'
         })
       }
@@ -171,7 +149,7 @@ export default {
           cancel:true,
           title:'Warning',
           color:'red-4',
-          message:'Sure for logout ?'
+          message:'Are You Sure You Want to Logout ?'
         }
       ).onOk(() => {
         this.store.logoutButtonGlobal()
@@ -189,13 +167,6 @@ export default {
     }
   },
   created(){
-    this.$watch('store.firebaseData',(newVal) => {
-      if(newVal){
-        this.checkForImage(newVal)
-      }
-    },{
-      immediate:true, deep:true
-    })
   },
   watch:{
     $route:{

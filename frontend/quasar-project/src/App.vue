@@ -30,7 +30,14 @@ export default defineComponent({
 
     }
   },
+  destroyed() {
+    window.removeEventListener('resize', this.handleResize);
+  },
   methods:{
+    handleResize() {
+      this.store.window.width = window.innerWidth;
+      this.store.window.height = window.innerHeight;
+    },
     welcomeMessage(){
       const check = this.store.checkForAnonOrNot()
       if(!check){
@@ -55,8 +62,6 @@ export default defineComponent({
       const auth = getAuth();
       onAuthStateChanged(auth, (user) => {
         if (user) {
-          // User is signed in, see docs for a list of available properties
-          // https://firebase.google.com/docs/reference/js/auth.user
           const uid = user.uid;
           // ...
           this.store.firebaseData = user
@@ -70,17 +75,7 @@ export default defineComponent({
             phoneNumber:user.phoneNumber ?? '',
             isAnonymous:user.isAnonymous
           }
-
-          const check = 'uid' in this.store.firebaseData
-          if(check === true){
-            const newfirebasedata  = firebaseData
-            this.store.getMyDetail(newfirebasedata)
-            this.store.getMyDetailFromDb()
-            this.store.welcomeMessageToMyNotifies()
-          }
         } else {
-          // User is signed out
-          // ...
           console.log('user not exist')
           this.replaceToLoginPage()
         }
@@ -88,6 +83,8 @@ export default defineComponent({
     }
   },
   created(){
+    window.addEventListener('resize', this.handleResize);
+    this.handleResize();
   },
   watch:{
     $route:{
@@ -96,7 +93,23 @@ export default defineComponent({
         this.checkCurrentState()
       },
       immediate:true, deep:true
-    }
+    },
+    'store.window':{
+      handler(newVal,oldVal){
+        if(newVal){
+          const check = ['width','height'].every((key) => key in this.store.window)
+          if(check === true){
+            const valCheck = Number(this.store.window.width) < Number(768) ? true : false
+            if(valCheck === true){
+              this.store.mobileActive = true
+            }else{
+              this.store.mobileActive = false
+            }
+          }
+        }
+      },
+      immediate:true, deep:true
+    },
   }
 })
 </script>

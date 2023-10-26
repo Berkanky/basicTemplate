@@ -42,6 +42,11 @@ const locationAdressDetailSchema = new mongoose.Schema({
         type:String,
         required:false,
     },
+    autoLocation:{
+        type:Boolean,
+        required:false,
+        default:false
+    }
 })
 
 const cvDetailSchema = new mongoose.Schema({
@@ -220,32 +225,33 @@ const UserSchema = new mongoose.Schema({
     socialMediaLinks:[socialMediaLinksSchema],
     totalWorkExperience:{
         type:Number,
-        required:false
+        required:false,
+        default:0
     },
     works:[workExperienceSchema],
     educations:[educationSchema],
     birthdayDate:birthdaySchema,
     gender:{
         type:String,
-        required:false
+        required:false,
     },
     selectedCvFile:cvDetailSchema,
     locationAdressDetail:locationAdressDetailSchema,
     dialCode:{
         type:String,
-        required:false
+        required:false,
     },
     bio:{
         type:String,
-        required:false
+        required:false,
     },
     phoneNumber:{
         type:String,
-        required:false
+        required:false,
     },
     displayName:{
         type:String,
-        required:false
+        required:false,
     },
     name: {
       type: String,
@@ -321,13 +327,13 @@ const UserSchema = new mongoose.Schema({
     },
     userDescription:{
         type:String,
-        requierd:false
+        requierd:false,
     },
     userName:{
         type:String,
-        required:false
+        required:false,
     },
-    myImages:[myImagesScehma]
+    myImages:[myImagesScehma],
   });
 
   const User = mongoose.model('User', UserSchema);

@@ -8,9 +8,10 @@
       </div>
     </q-card-section>
     <q-card-section class="text-center">
-      <div class="text-h6 text-weight-bold text-grey-7">
+<!--       <div class="text-h6 text-weight-bold text-grey-7">
         Sign In
-      </div>
+      </div> -->
+      <q-btn icon="login" color="grey-8" flat size="lg"></q-btn>
     </q-card-section>
     <q-card-section
       style="margin:0 auto;"
@@ -39,8 +40,7 @@
         </template>
       </q-input>
       <q-input
-        type="password"
-
+        :type="this.isPwd === true ? 'password' : 'text'"
         :class="this.store.mobileActive ? 'q-mt-xl' : 'q-mt-lg'"
         v-model="this.userData.password"
         label="Password"
@@ -50,6 +50,9 @@
           <q-icon name="lock"></q-icon>
         </template>
         <template v-slot:append>
+          <q-btn
+            flat color="grey-8" v-on:click="this.isPwd =! this.isPwd"
+            :icon="this.isPwd === true ? 'visibility_off' : 'visibility'"></q-btn>
           <q-btn icon="remove" flat color="red-4" v-if="this.userData.password" v-on:click="delete this.userData.password"></q-btn>
         </template>
       </q-input>
@@ -110,6 +113,7 @@ export default {
   data:function(){
     return{
       userData:{},
+      isPwd:false,
       loginOptions:[
         {id:1,label:'Google',icon:'fa-brands fa-google',color:'red-4',message:'Sign In With Google'},
         {id:2,label:'Phone',icon:'phone',color:'blue-4'},
@@ -156,7 +160,7 @@ export default {
             this.$q.notify({
               type:'positive',
               icon:'info',
-              message:'Password Reset Code Successfully Sended. Check Your Email.'
+              message:'Password Reset Code Successfully Sended. Check Your Email Please.'
             })
           })
           .catch((error) => {
@@ -168,7 +172,7 @@ export default {
         this.$q.notify({
           type:'negative',
           icon:'info',
-          message:'Please Enter Email !',
+          message:'Please Enter Your Email !',
           position:'bottom'
         })
       }
@@ -182,6 +186,7 @@ export default {
           // Signed in
           const user = userCredential.user;
           // ...
+          this.store.firebaseData = user
           this.$router.push(
             {
               path:'/'
@@ -211,6 +216,7 @@ export default {
           const user = result.user;
           // IdP data available using getAdditionalUserInfo(result)
           // ...
+          this.store.firebaseData = user
           console.log(user)
           this.$router.push(
             {
@@ -237,8 +243,9 @@ export default {
       }else if(data.id === 3){
         this.$q.dialog({
           cancel:true,
-          title:'Warning',
-          message:'Are You Sure for Continue Anon ?'
+          title:'Warning !',
+          color:'red-4',
+          message:'Continuing as an anonymous user will limit your access to certain features. Are you sure you want to continue ?'
         }).onOk(() => {
           this.signInAnon()
         }).onCancel(() => {

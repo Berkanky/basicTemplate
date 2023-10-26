@@ -3,6 +3,7 @@ import axios from 'axios';
 import { getAuth, signOut } from "firebase/auth";
 export const useCounterStore = defineStore('counter', {
   state: () => ({
+    defaultMainColor:'#24292e',
     baseUrl:'http://localhost:3000',
     firebaseData:{},
     window:{},
@@ -11,12 +12,30 @@ export const useCounterStore = defineStore('counter', {
     mobileActive:false,
     pexelsApiKey:'563492ad6f917000010000018990b39d61f845559dab3acb2c9dd16d',
     openCageApiKey:'a7ac3cc8ba514f0287f82a6a306eabc8',
-
-    phoneValidDialogActive:false
+    phoneValidDialogActive:false,
+    selectedOption:{},
+    newData:{}
   }),
   getters: {
   },
   actions: {
+    updateProfile(){
+      ///:firebaseId/updateMyProfile
+      const fid = this.firebaseData.uid
+      const url = this.baseUrl
+      const allBody = {
+        newData:this.newData
+      }
+      axios.put(`${url}/app/${fid}/updateMyProfile`, allBody)
+        .then(res => {
+          console.log(res)
+          this.getMyDetailFromDb()
+          this.newData = {}
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
     welcomeMessageToMyNotifies(){
       const check = this.firebaseData.isAnonymous === true ? true : false
       if(!check){
@@ -56,6 +75,8 @@ export const useCounterStore = defineStore('counter', {
 
         this.firebaseData = {}
         this.myData = {}
+        this.newData = {}
+        this.selectedOption = {}
         this.$router.replace(
           {
             path:'/login'
@@ -66,6 +87,7 @@ export const useCounterStore = defineStore('counter', {
       });
     },
     getMyDetailFromDb(){
+      console.log('aptal pic')
       const url = this.baseUrl
       const fid = this.firebaseData.uid
 
@@ -91,6 +113,7 @@ export const useCounterStore = defineStore('counter', {
         axios.put(`${this.baseUrl}/app/${this.firebaseData.uid}/getMyDetail`, allBody)
           .then (res => {
             console.log(res)
+            this.welcomeMessageToMyNotifies()
           })
           .catch(err => {
             console.log(err)

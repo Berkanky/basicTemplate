@@ -5,6 +5,7 @@
   background: transparent;  /* Optional: just make scrollbar invisible */
 }
 /* Optional: show position indicator in red */
+/* background: linear-gradient(to bottom, #ece9e6, #ffffff); */
 ::-webkit-scrollbar-thumb {
   background: #FF0000;
 }
@@ -12,7 +13,6 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
   overflow-y: scroll;
-  background: linear-gradient(to bottom, #ece9e6, #ffffff);
 }
 .myCard{
   position: absolute;
@@ -27,6 +27,9 @@
 
 <template>
   <q-page
+    :style="{
+      'background':this.store.defaultMainColor
+    }"
     class="myloginpage">
     <q-card
       :style="{
@@ -79,19 +82,6 @@
               :propUserData="this.propUserData"
             />
           </q-card-section>
-<!--           <q-card-section
-            class="text-center text-overline text-weight-bold text-grey-8">
-              <q-btn
-                v-if="this.selectedLoginPageOption.id === 1"
-                icon-right="arrow_right"
-                v-on:click="this.selectedLoginPageOption.id = 2"
-                icon="person_add" flat color="grey-8" no-caps label="or Sign Up"></q-btn>
-                <q-btn
-                  v-if="this.selectedLoginPageOption.id === 2"
-                  v-on:Click="this.selectedLoginPageOption.id = 1"
-                  color="grey-8"
-                  icon="arrow_left" no-caps flat label="Already Signed Up ?"></q-btn>
-          </q-card-section> -->
         </q-card-section>
       </q-card-section>
 
@@ -138,6 +128,18 @@ export default {
       propUserData:{}
     }
   },
+  beforeRouteLeave (to, from) {
+    const check = to.path === '/' ? true : false
+    if(check === true){
+      const check = this.store.firebaseData.hasOwnProperty('uid')
+      if(check === true){
+        const newfirebasedata = this.store.firebaseData
+        console.log('newfirebasedata',newfirebasedata)
+        this.store.getMyDetail(newfirebasedata)
+        //this.store.welcomeMessageToMyNotifies()
+      }
+    }
+  },
   methods:{
     getgoBackFromOnlywithemail(data){
       if(data){
@@ -178,100 +180,12 @@ export default {
         return false
       }
     },
-    handleResize() {
-      this.store.window.width = window.innerWidth;
-      this.store.window.height = window.innerHeight;
-    },
-    async getCurrentLocationDetails(allBody){
-      const res = await fetch(`
-        https://api.opencagedata.com/geocode/v1/json?q=${allBody.lat}+${allBody.lng}&key=${this.store.openCageApiKey}`
-      )
-      const resData = await res.json()
-      const locationDetail = {}
-
-      const lat = allBody.lat
-      const lng = allBody.lng
-      const address = resData.results[0].formatted
-      const country = resData.results[0].components.country
-      const city = resData.results[0].components.province
-      Object.assign(locationDetail,{
-        address,country,city,lat,lng,locationUpdateDate:new Date().toLocaleString()
-      })
-      console.log('locationDetail',locationDetail)
-      this.getRandomImages(locationDetail)
-    },
-    getCurrentLocationLatLng(){
-      const navigator = window.navigator;
-      navigator.geolocation.getCurrentPosition((position) => {
-        const latitude = position.coords.latitude;
-        const longitude = position.coords.longitude;
-        const allBody = {
-          lat:latitude,
-          lng:longitude
-        }
-        console.log(allBody)
-        const check = ['lat','lng'].every(
-          (key) => key in allBody
-        )
-        if(check === true){
-          this.getCurrentLocationDetails(allBody)
-        }
-      });
-    },
-    randomLoginImage(){
-      const randomNumber = Math.floor(Math.random() * 15);
-      const randomImage = this.randomImageList[randomNumber]
-
-      const imageUrl = randomImage.src.original
-      console.log(imageUrl)
-      this.randomImageUrl = imageUrl
-    },
-    async getRandomImages(locationDetail){
-      const res = await fetch(`https://api.pexels.com/v1/search?query=${locationDetail.country ?? locationDetail.city ?? 'new york'}`,{
-        headers:{
-          Authorization:this.store.pexelsApiKey
-        }
-      })
-
-      const resData  = await res.json()
-      this.randomImageList = resData.photos
-      this.randomImageList.forEach(element => {
-        const check = 'url' in element
-        if(!check){
-          this.randomImageList = this.randomImageList.filter(
-            object => object.id !== element.id
-          )
-        }
-      });
-      this.randomLoginImage()
-      console.log(this.randomImageList)
-    }
   },
-  destroyed() {
-    window.removeEventListener('resize', this.handleResize);
-  },
+
   created(){
-    window.addEventListener('resize', this.handleResize);
-    this.handleResize();
-    this.getCurrentLocationLatLng()
   },
   watch:{
-    'store.window':{
-      handler(newVal,oldVal){
-        if(newVal){
-          const check = ['width','height'].every((key) => key in this.store.window)
-          if(check === true){
-            const valCheck = Number(this.store.window.width) < Number(768) ? true : false
-            if(valCheck === true){
-              this.store.mobileActive = true
-            }else{
-              this.store.mobileActive = false
-            }
-          }
-        }
-      },
-      immediate:true, deep:true
-    },
+
   }
 }
 </script>

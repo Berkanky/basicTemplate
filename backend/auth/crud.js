@@ -85,6 +85,7 @@ app.put('/:firebaseId/getMyDetail',async(req,res) => {
             const newUserData = req.body.firebaseData
             Object.assign(newUserData,{
                 active:true,
+                fireBaseId:firebaseId
             }) 
             
             const newuser = new User(newUserData)
@@ -165,18 +166,18 @@ app.put('/getDialCodes',async(req,res) => {
 app.get('/:firebaseId/getCurrentUser',async(req,res) => {
     const {firebaseId} = req.params
     try{
-        const currentuser = await User.findOne(
-            {fireBaseId : firebaseId}
-        )
-
+        const currentuser = await User.findOne({fireBaseId : firebaseId})
         if(currentuser){
             res.status(200).json({currentuser})
+        }else{
+            res.status(200).json({mesage:'no user'})
         }
 
     }catch(err){
         res.status(500).json({message:'Internal Server Err'})
     }
 })
+
 
 
 module.exports = app

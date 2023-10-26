@@ -1,11 +1,41 @@
 <template>
-  <q-page></q-page>
+  <q-page
+    :style="{
+      'background':this.profilePageColor
+    }"
+  >
+    <div class="row">
+      <div class="col-12 col-md-4 col-sm-4 q-mt-lg">
+        <div class="row">
+          <div class="col-4" v-if="!this.store.mobileActive"></div>
+          <div class="col-8">
+            <leftBarImageInfo />
+            <leftBarOption />
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-8 col-sm-8">
+        <publicProfile v-if="this.store.selectedOption.id === 1"/>
+        <account v-if="this.store.selectedOption.id === 2"/>
+      </div>
+    </div>
+  </q-page>
 </template>
 
 <script>
+import account from 'src/profileComp/account.vue';
+import publicProfile from 'src/profileComp/publicProfile.vue';
+import leftBarOption from 'src/profileComp/leftBarOption.vue';
+import leftBarImageInfo from 'src/profileComp/leftBarImageInfo.vue';
 import axios from 'axios';
 import { useCounterStore } from 'src/stores/store';
 export default {
+  components:{
+    leftBarImageInfo,
+    leftBarOption,
+    publicProfile,
+    account
+  },
   setup(){
     const store = useCounterStore()
     return{
@@ -14,52 +44,86 @@ export default {
   },
   data:function(){
     return{
-      myData:{}
+      profilePageColor:'#0D1117'
     }
   },
   methods:{
     getCurrentUserDetail(){
       ///:firebaseId/getCurrentUser
       const url = this.store.baseUrl
-      const fid = this.$route.params.id ??  this.store.firebaseData.uid
+      const fid = this.$route.params.id
 
       axios.get(`${url}/app/${fid}/getCurrentUser`)
         .then( res => {
           console.log(res)
-          this.myData = res.data.currentuser
-          console.log('currentuser',this.myData)
+          this.store.myData = res.data.currentuser
         })
         .catch(err => {
           console.log(err)
         })
-
-    }
-  },
-  created(){
-    const check = this.store.firebaseData.hasOwnProperty('uid')
-    if(check === true){
-      //
-    }
-
-    this.$watch('store.firebaseData',(newVal) => {
-      if(newVal){
-        const check = newVal.hasOwnProperty('uid')
-        if(check ){
-          this.getCurrentUserDetail()
+    },
+    checkForEmptySlotsStoreNewData(newVal){
+      const obj = newVal
+      for (const key in obj) {
+        if (obj[key] === null || obj[key] === '') {
+          delete obj[key]
         }
       }
     },
-    {
-      immediate:true, deep:true
-    })
+  },
+  created(){
+
+  },
+  mounted(){
   },
   watch:{
-
+    'store.selectedOption':{
+      handler(newVal){
+        if(newVal){
+          const check = newVal.hasOwnProperty('id')
+          if(check === true){
+            this.getCurrentUserDetail()
+          }
+        }
+      },
+      immediate:true, deep:true
+    },
+    'store.newData':{
+      handler(newVal){
+        if(newVal){
+          console.log(newVal)
+          this.checkForEmptySlotsStoreNewData(newVal)
+        }
+      },
+      immediate:true, deep:true
+    },
+    'store.firebaseData':{
+      handler(newVal){
+        if(newVal){
+          this.getCurrentUserDetail()
+        }
+      },
+      immediate:true, deep:true
+    },
+    $route:{
+      handler(to,from){
+        //
+      },
+      immediate:true, deep:true
+    },
   }
 }
 </script>
 
 <style>
 
-
+::-webkit-scrollbar {
+  display: none;
+  width: 0;  /* Remove scrollbar space */
+  background: transparent;  /* Optional: just make scrollbar invisible */
+}
+/* Optional: show position indicator in red */
+::-webkit-scrollbar-thumb {
+  background: #FF0000;
+}
 </style>

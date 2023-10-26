@@ -3,9 +3,10 @@
   flat class="bg-transparent"
   >
     <q-card-section class="text-center">
-      <div class="text-h6 text-weight-bold text-grey-7">
+  <!--     <div class="text-h6 text-weight-bold text-grey-7">
         Sign Up
-      </div>
+      </div> -->
+      <q-btn icon="person_add" flat color="grey-8" size="lg"></q-btn>
     </q-card-section>
     <q-card-section
       style="margin:0 auto;"
@@ -21,6 +22,11 @@
             icon="keyboard_backspace" flat color="grey-8"
           ></q-btn>
         </q-card-section> -->
+
+        <div class="text-subtitle2 text-left q-pa-sm q-mb-md text-grey-7 text-weight-bold">
+          <q-icon name="info" color="grey-8" size="sm"></q-icon>
+          *Please Enter Your Email to Verify.
+        </div>
 
       <q-input
         :readonly="this.checkEmailCodeResult() === true ? true : false"
@@ -52,7 +58,11 @@
         </template>
         <template v-slot:append>
           <q-btn icon="remove" flat color="red-4" v-if="this.checkEmailData.emailCode" v-on:click="delete this.checkEmailData.emailCode"></q-btn>
-          <q-btn icon="restart_alt" flat color="grey-8" v-on:click="reSendCodeToEmail"></q-btn>
+          <q-btn icon="restart_alt" flat color="grey-8" v-on:click="reSendCodeToEmail">
+            <q-tooltip>
+              Clear All
+            </q-tooltip>
+          </q-btn>
         </template>
       </q-input>
       <q-btn
@@ -221,6 +231,7 @@ export default {
           // Signed up
           const user = userCredential.user;
           // ...
+          this.store.firebaseData = user
           this.$router.push(
             {
               path:'/'
