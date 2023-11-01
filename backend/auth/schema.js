@@ -13,6 +13,11 @@ const myImagesScehma = new mongoose.Schema({
     imageId:{
         type:String,
         required:false
+    },
+    hideStatus:{
+        type:Boolean,
+        required:false,
+        default:false
     }
 })
 
@@ -235,7 +240,11 @@ const UserSchema = new mongoose.Schema({
         type:String,
         required:false,
     },
-    selectedCvFile:cvDetailSchema,
+    selectedCvFile: {
+        type: cvDetailSchema,
+        default: {},
+    },
+    backupCvFiles:[cvDetailSchema],
     locationAdressDetail:locationAdressDetailSchema,
     dialCode:{
         type:String,
@@ -288,7 +297,8 @@ const UserSchema = new mongoose.Schema({
     },
     userImage:{
         type:String,
-        required:false
+        required:false,
+        default:''
     },
     googleImage:{
         type:String,

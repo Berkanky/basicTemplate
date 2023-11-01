@@ -29,11 +29,15 @@ const options = {
   const testCrud = require('./test/crud')
   const authCrud = require('./auth/crud')
   const notifyCrud = require('./notify/crud')
+  const galleryCrud = require('./galleryFunctions/crud')
+  const fileCrud = require('./fileCrud/crud')
 app.use('/app',
     testCrud,
     authCrud,
     notifyCrud,
-    profileUpdateCrud
+    profileUpdateCrud,
+    galleryCrud,
+    fileCrud
   )
 
   const port = 3000;

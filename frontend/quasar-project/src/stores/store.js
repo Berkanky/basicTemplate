@@ -14,7 +14,9 @@ export const useCounterStore = defineStore('counter', {
     openCageApiKey:'a7ac3cc8ba514f0287f82a6a306eabc8',
     phoneValidDialogActive:false,
     selectedOption:{},
-    newData:{}
+    newData:{},
+    myGalleryDialogActive:false,
+    cameraDialogActive:false
   }),
   getters: {
   },

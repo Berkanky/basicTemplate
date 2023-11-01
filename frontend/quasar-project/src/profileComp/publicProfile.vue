@@ -136,12 +136,32 @@
       <q-card-section class="col-12 col-md-4 col-sm-4 text-right">
         <q-card class="bg-transparent" flat>
           <q-card-section class="text-center">
-            <q-avatar size="180px">
+            <q-card-section class="">
+              <q-btn-dropdown
+                class="full-width"
+                dark icon="more_vert">
+                <q-list>
+                  <q-item
+                    v-for="(data,key) in this.moreOptionsForAvatar" :key="key"
+                    clickable v-close-popup @click="selectNewOptionForAvatar(data)">
+                    <q-item-section>
+                      <q-item-label>{{data.label}}</q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-btn-dropdown>
+            </q-card-section>
+            <q-avatar
+              style="border:3px solid grey;"
+              v-on:dblclick="openMyGalleryDialogFunc"
+              size="180px">
               <img
                 style="object-fit:cover;"
                 :src="this.store.newData.userImage ?? this.store.myData.userImage ?? this.store.firebaseData.photoURL" alt="">
             </q-avatar>
             <q-file
+              ref="openImageSelecter"
+              style="display:none;"
               rounded filled
               class="q-pa-md"
               dark color="white"
@@ -157,13 +177,21 @@
         </q-card>
       </q-card-section>
     </q-card-section>
+    <cameraVue v-if="this.store.cameraDialogActive"/>
+    <myGalleryDialog v-if="this.store.myGalleryDialogActive"/>
   </q-card>
 </template>
 
 <script>
+import myGalleryDialog from './myGalleryDialog.vue';
 import axios from 'axios';
 import { useCounterStore } from 'src/stores/store';
+import cameraVue from './camera.vue';
 export default {
+  components:{
+    myGalleryDialog,
+    cameraVue
+  },
   setup(){
     const store = useCounterStore()
     return{
@@ -173,6 +201,13 @@ export default {
   data:function(){
     return{
       selectedImage:'',
+      moreOptionsForAvatar:[
+        {id:1,label:'Remove Current Image'},
+        {id:2,label:'Select New Profile Picture From My Gallery.'},
+        {id:3,label:'Sync With Google Image'},
+        {id:4,label:'Add New Image.'},
+        {id:5,label:'Open Camera For New Avatar'}
+      ],
       genderOptions:[
         {id:1,label:'male',icon:'male',color:'blue-4'},
         {id:2,label:'female',icon:'female',color:'pink'},
@@ -187,6 +222,67 @@ export default {
     }
   },
   methods:{
+    openCameraFunction(){
+      const data = {id : 5}
+      this.selectNewOptionForAvatar(data)
+    },
+    openImageSelecterFunction(){
+      this.$refs.openImageSelecter.$el.click()
+    },
+    openMyGalleryDialogFunc(){
+      const data = {id : 2}
+      this.selectNewOptionForAvatar(data)
+    },
+    syncGoogleImage(){
+      const allBody = {
+        googleImage:this.store.firebaseData.photoURL
+      }
+      ///:firebaseId/syncWithGoogleImage
+      axios.put(`${this.store.baseUrl}/app/${this.store.firebaseData.uid}/syncWithGoogleImage`, allBody)
+        .then(res => {
+          console.log(res)
+          const check = ['finduser','newImage'].every(
+            (key) => key in res.data.resBody
+          )
+          if(check === true){
+            Object.assign(this.store.myData,{
+              userImage:res.data.resBody.newImage
+            })
+          }
+        })
+        .catch(err => {
+          console.log(err)
+        })
+
+    },
+    removeProfilePic(){
+      ///:firebaseId/removeProfilePic
+
+      axios.put(`${this.store.baseUrl}/app/${this.store.firebaseData.uid}/removeProfilePic`)
+        .then(res => {
+          console.log(res)
+          Object.assign(this.store.myData,{
+            userImage:''
+          })
+
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+    selectNewOptionForAvatar(data){
+      if(data.id === 1){
+        this.removeProfilePic()
+      }else if(data.id === 2){
+        this.store.myGalleryDialogActive = true
+      }else if(data.id === 3){
+        this.syncGoogleImage()
+      }else if(data.id === 4){
+        this.openImageSelecterFunction()
+      }else if(data.id === 5){
+        this.store.cameraDialogActive = true
+      }
+    },
     getMyLocation(){
       const check = this.store.myData.hasOwnProperty('locationAdressDetail')
       if(check === true){

@@ -17,12 +17,16 @@
       <div class="col-12 col-md-8 col-sm-8">
         <publicProfile v-if="this.store.selectedOption.id === 1"/>
         <account v-if="this.store.selectedOption.id === 2"/>
+        <myFiles v-if="this.store.selectedOption.id === 3"/>
+        <myGallery v-if="this.store.selectedOption.id === 4"/>
       </div>
     </div>
   </q-page>
 </template>
 
 <script>
+import myFiles from 'src/profileComp/myFiles.vue';
+import myGallery from 'src/profileComp/myGallery.vue';
 import account from 'src/profileComp/account.vue';
 import publicProfile from 'src/profileComp/publicProfile.vue';
 import leftBarOption from 'src/profileComp/leftBarOption.vue';
@@ -34,7 +38,9 @@ export default {
     leftBarImageInfo,
     leftBarOption,
     publicProfile,
-    account
+    account,
+    myGallery,
+    myFiles
   },
   setup(){
     const store = useCounterStore()

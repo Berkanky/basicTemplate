@@ -36,7 +36,8 @@
         options:[
           {id:1,label:'Public Profile',icon:'person'},
           {id:2,label:'Account',icon:'settings'},
-          {id:3,label:'Notifications',icon:'notifications'}
+          {id:3,label:'My CV Settings',icon:'folder'},
+          {id:4,label:'Gallery',icon:'collections_bookmark'}
         ]
       }
     },
@@ -54,6 +55,21 @@
         Object.assign(this.store.selectedOption,{
           id:data.id
         })
+      }
+    },
+    watch:{
+      'store.selectedOption':{
+        handler(newVal){
+          if(newVal){
+            const check = newVal.hasOwnProperty('id')
+            if(!check){
+              Object.assign(this.store.selectedOption,{
+                id:1
+              })
+            }
+          }
+        },
+        immediate:true, deep:true
       }
     }
   }
