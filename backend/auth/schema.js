@@ -246,6 +246,10 @@ const UserSchema = new mongoose.Schema({
     },
     backupCvFiles:[cvDetailSchema],
     locationAdressDetail:locationAdressDetailSchema,
+    preferedLocation:{
+        type:locationAdressDetailSchema,
+        defualt:{}
+    },
     dialCode:{
         type:String,
         required:false,

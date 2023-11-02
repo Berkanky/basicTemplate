@@ -37,7 +37,8 @@
           {id:1,label:'Public Profile',icon:'person'},
           {id:2,label:'Account',icon:'settings'},
           {id:3,label:'My CV Settings',icon:'folder'},
-          {id:4,label:'Gallery',icon:'collections_bookmark'}
+          {id:4,label:'Gallery',icon:'collections_bookmark'},
+          {id:5,label:'Location Details',icon:'location_on'}
         ]
       }
     },

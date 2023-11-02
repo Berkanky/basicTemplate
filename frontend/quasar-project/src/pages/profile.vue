@@ -19,12 +19,14 @@
         <account v-if="this.store.selectedOption.id === 2"/>
         <myFiles v-if="this.store.selectedOption.id === 3"/>
         <myGallery v-if="this.store.selectedOption.id === 4"/>
+        <locationSettings v-if="this.store.selectedOption.id === 5"/>
       </div>
     </div>
   </q-page>
 </template>
 
 <script>
+import locationSettings from 'src/profileComp/locationSettings.vue';
 import myFiles from 'src/profileComp/myFiles.vue';
 import myGallery from 'src/profileComp/myGallery.vue';
 import account from 'src/profileComp/account.vue';
@@ -40,7 +42,8 @@ export default {
     publicProfile,
     account,
     myGallery,
-    myFiles
+    myFiles,
+    locationSettings
   },
   setup(){
     const store = useCounterStore()

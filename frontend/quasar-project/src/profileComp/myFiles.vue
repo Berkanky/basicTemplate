@@ -92,22 +92,49 @@
         Backup CV Files
       </div>
       <q-card
+        :class="this.checkMouseOnData(data) === true ? 'bg-grey-10 text-white' : 'bg-transparent'"
+        v-on:mouseleave="mouseLeaveFunc(data)"
+        v-on:mouseover="mouseOnFunc(data)"
         v-for="(data,key) in this.myBackupFiles" :key="key"
-        class="bg-transparent" flat>
+        flat>
         <q-item>
           <q-item-section avatar>
-            <q-btn icon="download" size="md" v-on:click="this.downloadFile(data)"></q-btn>
-              <q-btn icon="fa-regular fa-file" size="md"></q-btn>
+            <q-btn
+              color="green-4" flat
+              icon="download" size="md" v-on:click="this.downloadFile(data)">
+              <q-tooltip>Downlaod File #{{ data._id ?? data.selectedCvId ?? '' }}</q-tooltip>
+            </q-btn>
+              <q-btn icon="fa-regular fa-file" size="md">
+                <q-tooltip>
+                  #{{ data._id ?? data.selectedCvId ?? '' }}
+                </q-tooltip>
+              </q-btn>
           </q-item-section>
           <q-item-section>
-            {{ data.selectedCvFileName ?? 'No Name' }}
+            <div class="text-capitalize">
+              {{ data.selectedCvFileName ?? 'No Name' }}
+            </div>
             <q-item-section caption class="text-grey-6">
-              {{ data.selectedCvDate ?? '' }}
+              <div>
+                <q-icon name="event" size="xs"></q-icon>
+                {{ data.selectedCvDate ?? '' }}
+              </div>
             </q-item-section>
           </q-item-section>
           <q-item-section avatar>
-            <q-btn icon="delete_forever" flat color="red-4"></q-btn>
-            <q-btn icon="expand_less" flat  color="white" v-on:click="makeItCurrentCv(data)"></q-btn>
+            <q-btn
+              v-on:click="removeBackupFile(data._id)"
+              icon="delete_forever" flat color="red-4">
+                <q-tooltip>
+                  Delete
+                  #{{ data._id ?? data.selectedCvId ?? ''}}
+                </q-tooltip>
+              </q-btn>
+            <q-btn icon="expand_less" flat  color="white" v-on:click="makeItCurrentCv(data)">
+              <q-tooltip>
+                Swipe Up
+              </q-tooltip>
+            </q-btn>
           </q-item-section>
         </q-item>
       </q-card>
@@ -125,6 +152,7 @@
             <q-btn
               v-on:click="clearCvSelected"
               icon="remove" size="sm" color="red-4" v-if="this.selectedCvString"></q-btn>
+            <q-icon name="upload"></q-icon>
           </template>
       </q-file>
     </q-card-section>
@@ -153,10 +181,61 @@ export default {
       myData:{},
       currentCv:{},
       selectedCvString:'',
-      myBackupFiles:[]
+      myBackupFiles:[],
+      mouseOnData:{}
     }
   },
   methods:{
+    checkMouseOnData(data){
+      const check = this.mouseOnData.hasOwnProperty('_id')
+      if(check === true){
+        const secCheck = this.mouseOnData._id === data._id ? true : false
+        return secCheck
+      }else{
+        return false
+      }
+    },
+    mouseLeaveFunc(data){
+      this.mouseOnData = {}
+    },
+    mouseOnFunc(data){
+      this.mouseOnData = data
+    },
+    removeBackupFileDB(id){
+      console.log(id)
+      ///:firebaseId/:selectedBackupFileId/removeBackupFile
+
+      const fid = this.store.firebaseData.uid
+      const url = this.store.baseUrl
+
+      axios.put(`${url}/app/${fid}/${id}/removeBackupFile`)
+        .then(res => {
+          console.log(res)
+
+          this.myBackupFiles = this.myBackupFiles.filter(
+            object => object._id !== id
+          )
+
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+    removeBackupFile(id){
+      this.$q.dialog(
+        {
+          cancel:true,
+          title:'Warning',
+          message:'Are You Sure to Delete Selected File ?',
+          color:'red-4',
+          dark:true
+        }
+      ).onOk(
+        () => {
+          this.removeBackupFileDB(id)
+        }
+      )
+    },
     downloadCurrentCv(){
       const data = this.currentCv
       console.log(data)

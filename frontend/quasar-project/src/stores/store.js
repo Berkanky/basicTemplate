@@ -16,7 +16,8 @@ export const useCounterStore = defineStore('counter', {
     selectedOption:{},
     newData:{},
     myGalleryDialogActive:false,
-    cameraDialogActive:false
+    cameraDialogActive:false,
+    openCageApiKey:'a7ac3cc8ba514f0287f82a6a306eabc8',
   }),
   getters: {
   },

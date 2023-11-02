@@ -93,4 +93,39 @@ app.put('/:firebaseId/makeSelectedCvCurrentCv',async(req,res) => {
 })
 
 
+
+app.put('/:firebaseId/:selectedBackupFileId/removeBackupFile', async(req,res) => {
+    const {firebaseId, selectedBackupFileId} = req.params
+    try{
+
+/*     
+        const filter = {fireBaseId : firebaseId}
+        const update = {
+            $pull: {backupCvFiles : {_id : selectedBackupFileId }}
+        }
+
+        const findmeandupdate = await User.findOneAndUpdate(filter, update)
+        if(findmeandupdate){
+            res.status(200).json({findmeandupdate, selectedBackupFileId})
+        }  */
+
+        const findme = await User.findOne({ fireBaseId : firebaseId})
+        if(findme){
+            const result = findme.backupCvFiles.some(
+                object => String(object._id) === selectedBackupFileId
+            )
+            if(result === true){
+                findme.backupCvFiles = findme.backupCvFiles.filter(
+                    object => String(object._id) !== String(selectedBackupFileId)
+                )
+                await findme.save()
+                res.status(200).json({findmeandupdate : findme, selectedBackupFileId})
+            }
+        }
+    }catch(err){
+        res.status(500).json({message:'Internal Server Err'})
+    }
+})
+
+
 module.exports = app
