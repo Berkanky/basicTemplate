@@ -10,7 +10,15 @@
     <q-card-section class="text-subtitle2">
       Favourited Locations
     </q-card-section>
-    <q-card-section class="text-right">
+    <q-card-section class=" row">
+      <q-space></q-space>
+      <q-btn
+        :disable="this.checkCurrentLocation() === true ? false : true"
+        outline
+        rounded
+        class="q-mr-sm"
+        v-on:click="deleteCurrentLocation" label="Delete Location" no-caps
+        icon="delete_forever" color="red-4"></q-btn>
       <q-btn
         rounded
         label="Get Current Location" no-caps color="grey-4"
@@ -65,20 +73,36 @@
       </q-card-section>
       <q-card-section horizontal>
         <q-card-section class="col">
-        <div>
-          Lat : {{ this.currentLocation.lat ? this.currentLocation.lat : '0' }}
-        </div>
-        <div class="q-mt-sm">
-          Lng : {{ this.currentLocation.lng ? this.currentLocation.lng : '0' }}
-        </div>
+        <q-card class="bg-dark text-white" bordered>
+          <q-card-section>
+            <div>
+              Lat : {{ this.currentLocation.lat ? this.currentLocation.lat : '0' }}
+            </div>
+          </q-card-section>
+        </q-card>
+        <q-card class="bg-dark text-white" bordered>
+          <q-card-section>
+            <div class="q-mt-sm">
+              Lng : {{ this.currentLocation.lng ? this.currentLocation.lng : '0' }}
+            </div>
+          </q-card-section>
+        </q-card>
       </q-card-section>
       <q-card-section class="col">
-        <div>
-          Country : {{ this.currentLocation.country ? this.currentLocation.country : 'No Country Info' }}
-        </div>
-        <div class="q-mt-sm">
-          City : {{ this.currentLocation.city ? this.currentLocation.city : 'No City Info' }}
-        </div>
+        <q-card class="bg-dark text-white" bordered>
+          <q-card-section>
+            <div>
+              Country : {{ this.currentLocation.country ? this.currentLocation.country : 'No Country Info' }}
+            </div>
+          </q-card-section>
+        </q-card>
+        <q-card class="bg-dark text-white" bordered>
+          <q-card-section>
+            <div class="q-mt-sm">
+              City : {{ this.currentLocation.city ? this.currentLocation.city : 'No City Info' }}
+            </div>
+          </q-card-section>
+        </q-card>
       </q-card-section>
       </q-card-section>
       <q-card-section class="">
@@ -108,6 +132,7 @@ import
    LCircle
   } from "@vue-leaflet/vue-leaflet";
 import { useCounterStore } from 'src/stores/store';
+import axios from "axios";
 export default {
   components:{
     LMap,
@@ -138,8 +163,38 @@ export default {
     }
   },
   methods:{
-    updateFunc(){
+    deleteCurrentLocationDB(){
+      ///:firebaseId/removeCurrentLocation
+      axios.put(`${this.store.baseUrl}/app/${this.store.firebaseData.uid}/removeCurrentLocation`)
+        .then(res => {
+          console.log(res)
+          this.currentLocation.address = ''
+          this.currentLocation.country = ''
+          this.currentLocation.city = ''
 
+          delete this.currentLocation.lat
+          delete this.currentLocation.lng
+        })
+        .catch(err=>{
+          console.log(err)
+        })
+    },
+    deleteCurrentLocation(){
+      this.$q.dialog(
+        {
+          dark:true,
+          title:'Warning',
+          message:'Are You Sure for Delete Selected Location From DataBase ?',
+          cancel:true,
+          color:'red-4'
+        }
+      ).onOk(
+        () => {
+          this.deleteCurrentLocationDB()
+        }
+      )
+    },
+    updateFunc(){
       const check = ['lat','lng'].every(
         (key) => key in this.currentLocation
       )

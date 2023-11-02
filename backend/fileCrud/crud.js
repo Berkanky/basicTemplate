@@ -128,4 +128,26 @@ app.put('/:firebaseId/:selectedBackupFileId/removeBackupFile', async(req,res) =>
 })
 
 
+//delete location
+
+
+app.put('/:firebaseId/removeCurrentLocation',async(req,res) => {
+    const {firebaseId} = req.params
+    try{
+        const findme = await User.findOne({fireBaseId : firebaseId})
+        if(findme){
+            const check = 'preferedLocation' in findme
+            if(check){
+                const update = {city: '',country:'',address:'',lat: null,lng:null}
+                Object.assign(findme.preferedLocation,update)
+                await findme.save()
+                res.status(200).json({findme,update})
+            }
+        }
+    }catch(err){
+        res.status(500).json({message:'Internal Server Err'})
+    }
+})
+
+
 module.exports = app
