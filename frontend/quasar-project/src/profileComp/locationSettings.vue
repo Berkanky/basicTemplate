@@ -31,6 +31,27 @@
       </q-btn>
     </q-card-section>
     <q-card-section>
+      <q-card
+        class="bg-transparent text-white" flat bordered
+      >
+        <q-card-section>
+          Location Settings
+        </q-card-section>
+        <q-separator color="grey-5"></q-separator>
+        <q-card-section>
+          <div>
+            <q-toggle
+              @update:model-value="updateLocationHideSettings"
+              :color="this.currentLocation.hideLocationActive === false ? 'red-4' : 'green'"
+              v-model="this.currentLocation.hideLocationActive"
+              :icon="this.currentLocation.hideLocationActive === false ? 'toggle_on' : 'toggle_on' "
+              :label="this.currentLocation.hideLocationActive === false ? 'Active Location' : 'Hide Location'"
+            />
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-card-section>
+    <q-card-section>
       <div
 
         :style="{
@@ -163,6 +184,45 @@ export default {
     }
   },
   methods:{
+    updateLocationHideSettings(val){
+      const check = this.store.newData.hasOwnProperty('preferedLocation')
+      if(check){
+        Object.assign(this.store.newData.preferedLocation,{
+          hideLocationActive:val
+        })
+      }else{
+        Object.assign(this.store.newData,{
+          preferedLocation:{hideLocationActive:val}
+        })
+      }
+
+      const secCheck = this.currentLocation.hasOwnProperty('preferedLocation')
+      if(secCheck){
+        Object.assign(this.currentLocation.preferedLocation,{
+          hideLocationActive:val
+        })
+      }else{
+        Object.assign(this.currentLocation,{
+          preferedLocation:{hideLocationActive:val}
+        })
+      }
+
+      console.log('currentLocation',this.currentLocation)
+      console.log('newData',this.store.newData)
+    },
+    getMyLocationHideActive(){
+      const check = this.currentLocation.hasOwnProperty('hideLocationActive')
+      if(check === true){
+        const secCheck = this.currentLocation.hideLocationActive === true ? true : false
+        Object.assign(this.currentLocation,{
+          hideLocationActive:secCheck
+        })
+      }else{
+        Object.assign(this.currentLocation,{
+          hideLocationActive:false
+        })
+      }
+    },
     deleteCurrentLocationDB(){
       ///:firebaseId/removeCurrentLocation
       axios.put(`${this.store.baseUrl}/app/${this.store.firebaseData.uid}/removeCurrentLocation`)
@@ -307,6 +367,7 @@ export default {
     getMyLocationDB(newVal){
       console.log('newVal,prefereclocation',newVal.preferedLocation)
       Object.assign(this.currentLocation,newVal.preferedLocation)
+      this.getMyLocationHideActive()
     }
   },
   created(){

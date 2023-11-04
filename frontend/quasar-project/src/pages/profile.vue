@@ -20,12 +20,14 @@
         <myFiles v-if="this.store.selectedOption.id === 3"/>
         <myGallery v-if="this.store.selectedOption.id === 4"/>
         <locationSettings v-if="this.store.selectedOption.id === 5"/>
+        <createWorkAdvert v-if="this.store.selectedOption.id === 6"/>
       </div>
     </div>
   </q-page>
 </template>
 
 <script>
+import createWorkAdvert from 'src/profileComp/createWorkAdvert.vue';
 import locationSettings from 'src/profileComp/locationSettings.vue';
 import myFiles from 'src/profileComp/myFiles.vue';
 import myGallery from 'src/profileComp/myGallery.vue';
@@ -43,7 +45,8 @@ export default {
     account,
     myGallery,
     myFiles,
-    locationSettings
+    locationSettings,
+    createWorkAdvert
   },
   setup(){
     const store = useCounterStore()

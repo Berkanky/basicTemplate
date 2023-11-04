@@ -51,6 +51,11 @@ const locationAdressDetailSchema = new mongoose.Schema({
         type:Boolean,
         required:false,
         default:false
+    },
+    hideLocationActive:{
+        type:Boolean,
+        required:false,
+        default:false
     }
 })
 

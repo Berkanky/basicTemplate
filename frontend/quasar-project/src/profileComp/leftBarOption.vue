@@ -38,7 +38,8 @@
           {id:2,label:'Account',icon:'settings'},
           {id:3,label:'My CV Settings',icon:'folder'},
           {id:4,label:'Gallery',icon:'collections_bookmark'},
-          {id:5,label:'Location Details',icon:'location_on'}
+          {id:5,label:'Location Details',icon:'location_on'},
+          {id:6,label:'Create New Work Location Advertise',icon:'work'}
         ]
       }
     },
@@ -56,6 +57,13 @@
         Object.assign(this.store.selectedOption,{
           id:data.id
         })
+        /*           const id = this.store.firebaseData.uid
+          this.$router.push(
+            {
+              path:`/createWorkAdvert/${id}`,
+              params:{id:id}
+            }
+          ) */
       }
     },
     watch:{

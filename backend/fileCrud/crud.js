@@ -138,7 +138,7 @@ app.put('/:firebaseId/removeCurrentLocation',async(req,res) => {
         if(findme){
             const check = 'preferedLocation' in findme
             if(check){
-                const update = {city: '',country:'',address:'',lat: null,lng:null}
+                const update = {city: '',country:'',address:'',lat: null,lng:null, hideLocationActive:false}
                 Object.assign(findme.preferedLocation,update)
                 await findme.save()
                 res.status(200).json({findme,update})

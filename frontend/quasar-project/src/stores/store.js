@@ -18,10 +18,24 @@ export const useCounterStore = defineStore('counter', {
     myGalleryDialogActive:false,
     cameraDialogActive:false,
     openCageApiKey:'a7ac3cc8ba514f0287f82a6a306eabc8',
+
+    createActivityDialogActive:false,
+    myAdverts:[]
   }),
   getters: {
   },
   actions: {
+    getMyAdverts(firebaseId){
+      //:/firebaseId/getMyAdverts
+      axios.get(`${this.baseUrl}/app/${firebaseId}/getMyAdverts`)
+        .then(res => {
+          console.log('getMyAdverts',res)
+          this.myAdverts = res.data.allAdverts
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
     updateProfile(){
       ///:firebaseId/updateMyProfile
       const fid = this.firebaseData.uid
