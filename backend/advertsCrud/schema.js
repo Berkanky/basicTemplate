@@ -29,7 +29,40 @@ const offerListSchema = new mongoose.Schema(
 )
 
 
+const imageSchema = new mongoose.Schema(
+    {
+        imageUrl:{
+            type:String,
+            required:false
+        },
+        Date:{
+            type:String,
+            required:false,
+            default:new Date().toLocaleString()
+        },
+        imageId:{
+            type:String,
+            required:false,
+            default:uuidv4()
+        },
+        imageType:{
+            type:String,
+            required:false,
+        },
+        imageName:{
+            type:String,
+            required:false
+        }
+    }
+)
+
+
 const advertSchema = new mongoose.Schema({
+    advertId:{
+        type:String,
+        required:false
+    },
+    advertImages:[imageSchema],
     advertAdminId:{
         type:String,
         required:false

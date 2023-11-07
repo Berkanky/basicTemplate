@@ -45,6 +45,19 @@ app.put('/:firebaseId/findUsers',async(req,res) => {
     }
 })
 
+const updateImages = (newData) => {
+    let newImagesList = []
+    newData.advertImages.forEach(element => {
+        const newObj = {
+            imageUrl:element.url,
+            imageType:element.type,
+            imageName:element.name,
+        }
+        newImagesList.push(newObj)
+    });
+    return newImagesList
+}
+
 
 app.post('/:firebaseId/postAdvert',async(req,res) => {
     const {firebaseId} = req.params
@@ -53,8 +66,14 @@ app.post('/:firebaseId/postAdvert',async(req,res) => {
         const newData = req.body.newData
         Object.assign(newData,{
             advertAdminId:findme._id,
+            advertId:uuidv4(),
             advertAdminFirebaseId:firebaseId
         })
+
+        Object.assign(newData,{
+            advertImages:updateImages(newData)
+        })
+
         const newPostAdvert = new Advert(newData)
         await newPostAdvert.save()
         res.status(200).json({newPostAdvert})
@@ -76,6 +95,48 @@ app.put('/:firebaseId/:selectedAdvertId/removeSelectedAdvert', async(req,res) =>
     }catch(err){
         res.status(500).json({message:'Internal Server Err'})
     }   
+})
+
+
+app.get('/:selecteUserId/getSelectedUserDetail',async(req,res) => {
+    const {selecteUserId} = req.params
+    try{
+        const filter = {fireBaseId : selecteUserId}
+        const findme = await User.findOne(filter)
+        res.status(200).json({findme})
+    }catch(err){
+        res.status(500).json({message:'Internal Server Err'})
+    }
+})
+
+
+
+
+const advertOwnerDetail = async (fid) => {
+    const user = await User.findOne({ fireBaseId: fid });
+    return user;
+  };
+  
+
+
+app.get('/:selectedAdvertId/getSelectedAdvertDetail',async(req,res) => {
+    const {selectedAdvertId} = req.params
+    try{
+        const resBody = {}
+
+        const filter = {_id : selectedAdvertId}
+        const advertDetail = await Advert.findOne(filter)
+        if(advertDetail){
+            const fid = advertDetail.advertAdminFirebaseId
+            const ownerDetail = await advertOwnerDetail(fid);
+            Object.assign(resBody,{
+                ownerDetail,advertDetail
+            })
+            res.status(200).json({resBody})
+        }
+    }catch(err){
+        res.status(500).json({message:'Internal Server Err'})
+    }
 })
 
 module.exports = app

@@ -20,11 +20,38 @@ export const useCounterStore = defineStore('counter', {
     openCageApiKey:'a7ac3cc8ba514f0287f82a6a306eabc8',
 
     createActivityDialogActive:false,
-    myAdverts:[]
+    myAdverts:[],
+    addImageActive:false,
+    newAddedImages:[],
+    selectedUserDetail:{}
   }),
   getters: {
   },
   actions: {
+    getAdvertDetail(id){
+      axios.get(`${this.baseUrl}/app/${id}/getSelectedAdvertDetail`)
+        .then(res => {
+          console.log('getSelectedAdvertDetail',res)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+    checkselectedUserDetail(){
+      const check = this.selectedUserDetail.hasOwnProperty('_id')
+      return check
+    },
+    getSelectedUserDetail(id){
+      const url = this.baseUrl
+      axios.get(`${url}/app/${id}/getSelectedUserDetail`)
+        .then( res => {
+          console.log(res)
+          this.selectedUserDetail = res.data.findme
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
     getMyAdverts(firebaseId){
       //:/firebaseId/getMyAdverts
       axios.get(`${this.baseUrl}/app/${firebaseId}/getMyAdverts`)

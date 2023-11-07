@@ -32,30 +32,72 @@
         </q-item>
       </q-card>
     </q-card-section>
-    <q-card-section>
+    <q-card-section class="row">
       <q-btn icon="list" flat label="My Adverts" no-caps></q-btn>
+      <q-space></q-space>
+      <q-btn
+        color="white" text-color="dark"
+        :label="this.store.myAdverts.length " round></q-btn>
     </q-card-section>
     <q-card-section>
+      <q-scroll-area
+        style="height:500px;width:100%;"
+      >
       <q-card
         v-for="(data,key) in this.store.myAdverts" :key="key"
         class="bg-transparent text-white" flat bordered>
         <q-item clickable>
           <q-item-section avatar>
-            <q-avatar size="70px">
+            <q-avatar size="70px" v-on:click="goActivity(data)">
               <img :src="data.activityImage" alt="" style="object-fit:cover;">
             </q-avatar>
           </q-item-section>
           <q-item-section>
             {{ data.activityName ?? '' }}
-            <q-item-section caption class="text-weight-bold text-grey-6">
+            <q-item-section caption class="text-weight-bold text-grey-6 text-caption row">
+              <q-icon name="info"></q-icon>
               {{ data.description ?? '' }}
             </q-item-section>
           </q-item-section>
           <q-item-section>
+            <q-btn flat icon="info" v-on:click="getDetail(data)">
+              <q-menu v-if="this.store.checkselectedUserDetail()">
+                <div class="row no-wrap q-pa-md">
+                  <div class="column">
+                    <div class="text-h6 q-mb-md">Informations</div>
+                    <div class="text-subtitle2 text-grey-7">
+                      Name : {{ this.store.selectedUserDetail.name ?? this.store.selectedUserDetail.displayName ?? '' }}
+                    </div>
+                    <div class="text-subtitle2 text-grey-7">
+                      {{ this.store.selectedUserDetail.active === true ? 'Online' : this.store.selectedUserDetail.lastLoginDate }}
+                    </div>
+                  </div>
+                  <q-separator vertical inset class="q-mx-lg" />
+                  <div class="column items-center">
+                    <q-avatar size="72px">
+                      <img
+                        style="object-fit:cover;"
+                        :src="this.store.selectedUserDetail.userImage ?? this.store.selectedUserDetail.googleImage">
+                    </q-avatar>
+                    <div class="text-subtitle1 q-mt-md q-mb-xs">
+                      {{ this.store.selectedUserDetail.email ? `@${this.store.selectedUserDetail.email}`  :  '@' }}
+                    </div>
+                    <q-btn
+                      color="red-4"
+                      label="Close"
+                      flat
+                      size="sm"
+                      v-close-popup
+                    />
+                  </div>
+                </div>
+              </q-menu>
+            </q-btn>
             <q-btn icon="delete_forever" flat color="red-4" v-on:click="deleteMyAdvert(data._id)"></q-btn>
           </q-item-section>
         </q-item>
       </q-card>
+    </q-scroll-area>
     </q-card-section>
     <createActivityVue v-if="this.store.createActivityDialogActive"/>
   </q-card>
@@ -77,12 +119,33 @@ export default {
   },
   data:function(){
     return{
-      options:[
-
-      ]
+      options:[]
     }
   },
   methods:{
+    goActivity(data){
+      this.$q.dialog(
+        {
+          dark:true,
+          title:'Warning',
+          message:'Are You Sure for Continue Detail for Selected Activity ?',
+          cancel:true
+        }
+      ).onOk(
+        () => {
+          this.$router.push(
+            {
+              path:`/activityDetail/${data._id}`,
+              params:{id:data._id}
+            }
+          )
+        }
+      )
+    },
+    getDetail(data){
+      const id = data.advertAdminFirebaseId
+      this.store.getSelectedUserDetail(id)
+    },
     deleteMyAdvert(id){
         ///:firebaseId/:selectedAdvertId/removeSelectedAdvert
       axios.put(`${this.store.baseUrl}/app/${this.store.firebaseData.uid}/${id}/removeSelectedAdvert`)

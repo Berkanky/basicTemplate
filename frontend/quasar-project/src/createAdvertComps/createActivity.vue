@@ -206,33 +206,63 @@
         </transition-group>
       </q-card-section>
       <map-vue @newObjForNewData="getnewObjForNewData"/>
+
+
+      <q-card-section class="row">
+        <q-card class="bg-dark col-4" style="height:150px;">
+          <q-btn
+            v-on:click="this.store.addImageActive =! this.store.addImageActive"
+            icon="add" color="dark" text-color="green-4" class="full-height full-width"></q-btn>
+        </q-card>
+        <imagesComp
+          v-if="!this.store.addImageActive"/>
+      </q-card-section>
+
       <q-card-section class="row" v-if="this.checkNewData()">
-        <q-btn
-          class="col"
-          v-on:click="createActivityPost"
-          color="green-4"
-          no-caps label="Create"
-          icon="edit"
-        ></q-btn>
-        <q-btn
-          class="col"
-          v-on:click="clearAll"
-          color="red-4"
-          icon="clear_all"
-          no-caps label="Clear"
-        ></q-btn>
+        <q-card
+          style="height:150px;" class="col bg-dark">
+          <q-btn
+            class="full-height full-width"
+            v-on:click="createActivityPost"
+            color="dark" text-color="green-5"
+            icon="upload"
+            size="lg"
+          >
+            <q-tooltip>
+              Upload
+            </q-tooltip>
+          </q-btn>
+        </q-card>
+        <q-card class="col bg-dark q-ml-xs" style="height:150px;">
+          <q-btn
+            class="full-height full-width"
+            v-on:click="clearAll"
+            color="dark" text-color="red-4"
+            icon="clear_all"
+          >
+            <q-tooltip>
+              Clear
+            </q-tooltip>
+          </q-btn>
+        </q-card>
       </q-card-section>
     </q-card>
+    <addImageGlobal
+      v-if="this.store.addImageActive"/>
   </q-dialog>
 </template>
 
 <script>
+import imagesComp from './imagesComp.vue'
+import addImageGlobal from './addImageGlobal.vue'
 import {useCounterStore} from '../stores/store'
 import axios from 'axios'
 import mapVue from './map.vue'
 export default {
   components:{
-    mapVue
+    addImageGlobal,
+    mapVue,
+    imagesComp
   },
   setup(){
     const store = useCounterStore()
@@ -411,6 +441,20 @@ export default {
 
   },
   watch:{
+    'store.newAddedImages':{
+      handler(newVal){
+        if(newVal.length){
+          Object.assign(this.newData,{
+            advertImages:this.store.newAddedImages
+          })
+        }else{
+          Object.assign(this.newData,{
+            advertImages:[]
+          })
+        }
+      },
+      immediate:true, deep:true
+    },
     offerList:{
       handler(newVal,oldVal){
         if(newVal.length){
