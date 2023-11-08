@@ -111,7 +111,7 @@ const advertSchema = new mongoose.Schema({
         required:false,
         default:0
     },
-    maxRamge:{ //user member
+    maxRange:{ //user member
         type:Number,
         required:false,
         default:0
@@ -125,7 +125,12 @@ const advertSchema = new mongoose.Schema({
         type:locationSchema,
         required:false
     },
-    offerList:[offerListSchema]
+    offerList:[offerListSchema],
+    updatedDate:{
+        type:String,
+        required:false,
+        default:''
+    }
 })
 
 

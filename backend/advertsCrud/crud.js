@@ -139,4 +139,23 @@ app.get('/:selectedAdvertId/getSelectedAdvertDetail',async(req,res) => {
     }
 })
 
+
+//update advert
+
+app.put('/:selectedAdvertId/updateSelectedAdvert',async(req,res) => {
+    const {selectedAdvertId} = req.params
+    try{
+        const update = req.body.advertDetail
+        Object.assign(update,{
+            updatedDate:new Date().toLocaleString()
+        })
+        const filter = {_id : selectedAdvertId}
+        const findandupdate = await Advert.findOneAndUpdate(filter,update)
+        res.status(200).json({findandupdate})
+    }catch(err){
+        res.status(500).json({message:'Internal  Server Err'})
+    }
+})
+
+
 module.exports = app

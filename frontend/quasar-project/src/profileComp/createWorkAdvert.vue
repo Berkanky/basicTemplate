@@ -93,6 +93,9 @@
                 </div>
               </q-menu>
             </q-btn>
+            <q-btn
+              icon="edit" flat color="white" v-on:click="updateActive(data._id)"
+            ></q-btn>
             <q-btn icon="delete_forever" flat color="red-4" v-on:click="deleteMyAdvert(data._id)"></q-btn>
           </q-item-section>
         </q-item>
@@ -100,16 +103,21 @@
     </q-scroll-area>
     </q-card-section>
     <createActivityVue v-if="this.store.createActivityDialogActive"/>
+    <updateActivity
+      :selectedAdvertDetail="this.selectedAdvertDetail"
+      v-if="this.store.updateActivityDialogActive"/>
   </q-card>
 </template>
 
 <script>
+import updateActivity from 'src/createAdvertComps/updateActivity.vue';
 import axios from 'axios';
 import { useCounterStore } from 'src/stores/store';
 import createActivityVue from 'src/createAdvertComps/createActivity.vue';
 export default {
   components:{
-    createActivityVue
+    createActivityVue,
+    updateActivity
   },
   setup(){
     const store = useCounterStore()
@@ -119,10 +127,19 @@ export default {
   },
   data:function(){
     return{
-      options:[]
+      options:[],
+      selectedAdvertDetail:{}
     }
   },
   methods:{
+    updateActive(id){
+      console.log(id)
+      Object.assign(this.selectedAdvertDetail,{
+        id:id
+      })
+
+      this.store.updateActivityDialogActive = true
+    },
     goActivity(data){
       this.$q.dialog(
         {

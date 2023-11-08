@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import axios from 'axios';
+import axios, { all } from 'axios';
 import { getAuth, signOut } from "firebase/auth";
 export const useCounterStore = defineStore('counter', {
   state: () => ({
@@ -23,15 +23,31 @@ export const useCounterStore = defineStore('counter', {
     myAdverts:[],
     addImageActive:false,
     newAddedImages:[],
-    selectedUserDetail:{}
+    selectedUserDetail:{},
+    updateActivityDialogActive:false,
+    selectedAdvertDetailDB:{}
   }),
   getters: {
   },
   actions: {
+    updateAdvert(newData){
+      ///:selectedAdvertId/updateSelectedAdvert
+      const allBody = {
+        advertDetail:newData
+      }
+      axios.put(`${this.baseUrl}/app/${newData._id}/updateSelectedAdvert`, allBody)
+        .then(res => {
+          console.log(res)
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
     getAdvertDetail(id){
       axios.get(`${this.baseUrl}/app/${id}/getSelectedAdvertDetail`)
         .then(res => {
           console.log('getSelectedAdvertDetail',res)
+          this.selectedAdvertDetailDB = res.data.resBody.advertDetail
         })
         .catch(err => {
           console.log(err)
