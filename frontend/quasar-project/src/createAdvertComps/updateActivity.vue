@@ -131,17 +131,99 @@
             icon="add" class="full-width full-height" color="green-4" flat></q-btn>
         </q-card>
       </q-card-section>
+      <q-card-section class="row">
+        <q-date
+          v-model="this.advertDetail.activityStartDate"
+          dark color="grey-6"
+          mask="YYYY-MM-DD"
+          class="col-6"
+        />
+        <q-time
+          class="col-6"
+          v-model="this.advertDetail.activityStartHour"
+          mask="HH:mm" color="grey-6" dark />
+      </q-card-section>
+      <q-card-section class="text-right">
+        <q-btn icon="location_on" outline color="green-4" no-caps label="Find Location" v-on:click="this.getCurrentLocationLatLng()"></q-btn>
+      </q-card-section>
+      <q-card-section>
+        <div class="text-subtitle2">
+          <q-icon name="info" color="grey-8"></q-icon>
+          Update Circle Radius -
+        </div>
+        <q-slider
+          dark
+          color="orange-4"
+          v-model="this.newData.radius" :min="0" :max="100000"/>
+      </q-card-section>
+      <div
+        :style="{
+          'width':this.store.mobileActive ? '100%' : '100%',
+          'height':this.store.mobileActive ? '500px' : '500px'
+        }"
+      >
+        <l-map
+          :use-global-leaflet="false"
+          ref="map" v-model:zoom="this.newData.zoom" :center="this.newData.defaultLocation">
+            <l-tile-layer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              layer-type="base"
+              name="OpenStreetMap"
+            ></l-tile-layer>
+            <l-marker
+                @dragend="getUpdatedData"
+                draggable="true"
+                :lat-lng="this.newData.defaultLocation" >
+              <l-popup>
+                Selected Location
+              </l-popup>
+            </l-marker>
+            <l-circle
+              :lat-lng="this.newData.defaultLocation"
+              :radius="this.newData.radius"
+              :color="this.newData.color"
+            />
+        </l-map>
+      </div>
+      <q-card-section>
+        <q-card class="bg-transparent" flat>
+          <q-item clickable>
+            <q-item-section>
+              <q-btn icon="groups" v-on:click="this.store.offerListUpdateDialogActive = true"></q-btn>
+            </q-item-section>
+          </q-item>
+        </q-card>
+      </q-card-section>
     </q-card>
     <q-file ref="fileInput" v-model="this.image" style="display: none" @update:model-value="selectNewFile"/>
     <q-file ref="fileInputSecond" v-model="this.imageSecond" style="display: none" @update:model-value="selectNewFileSecond"/>
+    <updateOfferList v-if="this.store.offerListUpdateDialogActive"/>
   </q-dialog>
 </template>
 
 <script>
+import "leaflet/dist/leaflet.css";
+import
+  {
+   LMap,
+   LTileLayer,
+   LMarker,
+   LPopup,
+   LCircle
+  } from "@vue-leaflet/vue-leaflet";
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 import { useCounterStore } from 'src/stores/store';
+import updateOfferList from "./updateOfferList.vue";
 export default {
+  components:{
+    LMap,
+    LTileLayer,
+    LMarker,
+    LPopup,
+    LCircle,
+    updateOfferList
+  },
   props:['selectedAdvertDetail'],
   setup(){
     const store = useCounterStore()
@@ -151,15 +233,71 @@ export default {
   },
   data:function(){
     return{
+      url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      attribution:
+        '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+      defaultLocation:[47.41322, -1.219482],
       advertDetail:{},
       imageSecond:'',
       image:'',
       minMaxVal:{},
       newAddedImages:[],
-      updatedNewAddedImages:[]
+      updatedNewAddedImages:[],
+      newData:{
+        radius:700,
+        lat:0,
+        lng:0,
+        color: 'red',
+        zoom:10,
+        defaultLocation:[46,50],
+      },
     }
   },
   methods:{
+    getCurrentLocation(){
+      const check = this.advertDetail.hasOwnProperty('locationDetails')
+      if(check === true){
+        this.newData.defaultLocation = []
+        this.newData.defaultLocation[0] = Number(this.advertDetail.locationDetails.lat)
+        this.newData.defaultLocation[1] = Number(this.advertDetail.locationDetails.lng)
+      }
+    },
+    updateLocationDetails(){
+      const newlocationDetails = {
+        lat:this.newData.defaultLocation[0],
+        lng:this.newData.defaultLocation[1],
+        radius:this.newData.radius
+      }
+
+      Object.assign(this.advertDetail,{
+        locationDetails:newlocationDetails
+      })
+    },
+    getUpdatedData(e){
+      const newLocationData = {
+        lat:e.target._latlng.lat,
+        lng:e.target._latlng.lng
+      }
+      console.log(newLocationData)
+      this.newData.defaultLocation = []
+      this.newData.defaultLocation[0] = newLocationData.lat
+      this.newData.defaultLocation[1] = newLocationData.lng
+    },
+    getCurrentLocationLatLng(){
+      const navigator = window.navigator;
+      navigator.geolocation.getCurrentPosition((position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        const allBody = {
+          lat:latitude,
+          lng:longitude
+        }
+        console.log(allBody)
+        this.newData.defaultLocation = []
+        this.newData.defaultLocation[0] = allBody.lat
+        this.newData.defaultLocation[1] = allBody.lng
+      });
+    },
     removeImageFromdb(data){
       this.advertDetail.advertImages = this.advertDetail.advertImages.filter(
         object => object.imageId !== data.imageId
@@ -253,6 +391,7 @@ export default {
         }
       ).onOk(
         () => {
+          this.updateLocationDetails()
           this.addAdvertImages()
           console.log(this.advertDetail)
           const newData = this.advertDetail
@@ -337,6 +476,7 @@ export default {
           console.log(newVal)
           this.advertDetail = newVal
           this.updateMinMaxRange(newVal)
+          this.getCurrentLocation()
         }
       },
       immediate:true, deep:true

@@ -110,6 +110,7 @@
 </template>
 
 <script>
+
 import updateActivity from 'src/createAdvertComps/updateActivity.vue';
 import axios from 'axios';
 import { useCounterStore } from 'src/stores/store';
@@ -117,7 +118,7 @@ import createActivityVue from 'src/createAdvertComps/createActivity.vue';
 export default {
   components:{
     createActivityVue,
-    updateActivity
+    updateActivity,
   },
   setup(){
     const store = useCounterStore()
@@ -127,6 +128,8 @@ export default {
   },
   data:function(){
     return{
+      zoom:10,
+
       options:[],
       selectedAdvertDetail:{}
     }

@@ -139,7 +139,6 @@ app.get('/:selectedAdvertId/getSelectedAdvertDetail',async(req,res) => {
     }
 })
 
-
 //update advert
 
 app.put('/:selectedAdvertId/updateSelectedAdvert',async(req,res) => {

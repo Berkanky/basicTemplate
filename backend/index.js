@@ -32,6 +32,7 @@ const options = {
   const galleryCrud = require('./galleryFunctions/crud')
   const fileCrud = require('./fileCrud/crud')
   const advertCrud = require('./advertsCrud/crud')
+  const findUsersCrud = require('./findUsers/crud')
 app.use('/app',
     testCrud,
     authCrud,
@@ -39,7 +40,8 @@ app.use('/app',
     profileUpdateCrud,
     galleryCrud,
     fileCrud,
-    advertCrud
+    advertCrud,
+    findUsersCrud
   )
 
   const port = 3000;
