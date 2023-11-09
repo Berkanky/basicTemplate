@@ -130,7 +130,8 @@ const advertSchema = new mongoose.Schema({
         type:String,
         required:false,
         default:''
-    }
+    },
+    memberList:[offerListSchema]
 })
 
 

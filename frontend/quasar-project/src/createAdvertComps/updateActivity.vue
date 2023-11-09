@@ -254,12 +254,15 @@ export default {
     }
   },
   methods:{
+
     getCurrentLocation(){
       const check = this.advertDetail.hasOwnProperty('locationDetails')
       if(check === true){
         this.newData.defaultLocation = []
         this.newData.defaultLocation[0] = Number(this.advertDetail.locationDetails.lat)
         this.newData.defaultLocation[1] = Number(this.advertDetail.locationDetails.lng)
+
+        this.newData.radius = this.advertDetail.locationDetails.radius
       }
     },
     updateLocationDetails(){

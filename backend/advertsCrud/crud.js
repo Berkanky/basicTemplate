@@ -157,4 +157,19 @@ app.put('/:selectedAdvertId/updateSelectedAdvert',async(req,res) => {
 })
 
 
+//remove user from offerList
+app.put('/:selectedAdvertId/:selectedUserFirebaseId/removeFromOfferList',async(req,res) => {
+    const {selectedAdvertId, selectedUserFirebaseId} = req.params
+    try{
+        const findadvert = await Advert.findOneAndUpdate(
+            {_id : selectedAdvertId},
+            {$pull : {offerList : {userFirebaseId : selectedUserFirebaseId}}}
+        )
+        res.status(200).json({findadvert})
+    }catch(err){
+        res.status(500).json({message:'Internal Server Err'})
+    }
+})
+
+
 module.exports = app
