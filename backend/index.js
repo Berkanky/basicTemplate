@@ -24,7 +24,7 @@ const options = {
   app.use(express.urlencoded({ limit: '350mb', extended: true }));
 
 
-
+  const myOfferListNotifies = require('./myOfferListNotifies/crud')
   const profileUpdateCrud = require('./profileUpdate/crud')
   const testCrud = require('./test/crud')
   const authCrud = require('./auth/crud')
@@ -33,6 +33,7 @@ const options = {
   const fileCrud = require('./fileCrud/crud')
   const advertCrud = require('./advertsCrud/crud')
   const findUsersCrud = require('./findUsers/crud')
+  const sendOfferNotifyCrud = require('./sendOfferNotify/crud')
 app.use('/app',
     testCrud,
     authCrud,
@@ -41,7 +42,9 @@ app.use('/app',
     galleryCrud,
     fileCrud,
     advertCrud,
-    findUsersCrud
+    findUsersCrud,
+    sendOfferNotifyCrud,
+    myOfferListNotifies
   )
 
   const port = 3000;

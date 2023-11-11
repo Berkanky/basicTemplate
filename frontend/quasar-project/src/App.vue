@@ -1,6 +1,7 @@
 <template>
  <div class="myApp">
   <router-view />
+  <myNotifies v-if="this.store.myNotifyDialogActive"/>
  </div>
 </template>
 
@@ -13,11 +14,15 @@
 </style>
 
 <script>
+import myNotifies from './components/myNotifies.vue';
 import { useCounterStore } from './stores/store';
 import { defineComponent } from 'vue'
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {auth} from './firebase/index'
 export default defineComponent({
+  components:{
+    myNotifies
+  },
   name: 'App',
   setup(){
     const store = useCounterStore()

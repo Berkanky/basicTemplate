@@ -20,6 +20,9 @@
             <img :src="myLogo" alt="">
           </q-avatar>
         </q-toolbar-title>
+        <q-btn
+          class="q-mr-md"
+          icon="notifications" dense flat round v-on:click="this.store.myNotifyDialogActive =! this.store.myNotifyDialogActive"></q-btn>
         <q-btn dense flat round icon="logout" v-on:click="logoutButton"></q-btn>
       </q-toolbar>
     </q-header>

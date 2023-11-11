@@ -109,16 +109,11 @@ app.get('/:selecteUserId/getSelectedUserDetail',async(req,res) => {
     }
 })
 
-
-
-
 const advertOwnerDetail = async (fid) => {
     const user = await User.findOne({ fireBaseId: fid });
     return user;
-  };
+};
   
-
-
 app.get('/:selectedAdvertId/getSelectedAdvertDetail',async(req,res) => {
     const {selectedAdvertId} = req.params
     try{
@@ -166,6 +161,35 @@ app.put('/:selectedAdvertId/:selectedUserFirebaseId/removeFromOfferList',async(r
             {$pull : {offerList : {userFirebaseId : selectedUserFirebaseId}}}
         )
         res.status(200).json({findadvert})
+    }catch(err){
+        res.status(500).json({message:'Internal Server Err'})
+    }
+})
+
+
+const userrequestback = async (selectedAdvertId, selectedUserFirebaseId) => {
+    const update = {
+        $pull : {offerList : {userFirebaseId : selectedUserFirebaseId}}
+    }
+    const filter = {_id : selectedAdvertId}
+    const updateadvert = await Advert.findOneAndUpdate(filter,update)
+
+    const finduserdetail = await User.findOne({fireBaseId : selectedUserFirebaseId})
+
+    const findusernotify = await MyNotifies.findOne({userId : finduserdetail._id })
+
+    findusernotify.offerList = findusernotify.offerList.filter(
+        object => String(object.advertId) !== String(selectedAdvertId)
+    )
+    findusernotify.markModified("offerList")
+    await findusernotify.save()
+}
+
+app.put('/:selectedAdvertId/:selectedUserFirebaseId/offerRequestBack', async(req,res) => {
+    const {selectedAdvertId, selectedUserFirebaseId} = req.params
+    try{
+        await userrequestback(selectedAdvertId, selectedUserFirebaseId)
+        res.status(200).json({message:'Done'})
     }catch(err){
         res.status(500).json({message:'Internal Server Err'})
     }

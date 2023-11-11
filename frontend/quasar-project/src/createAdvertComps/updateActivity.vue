@@ -185,15 +185,9 @@
             />
         </l-map>
       </div>
-      <q-card-section>
-        <q-card class="bg-transparent" flat>
-          <q-item clickable>
-            <q-item-section>
-              <q-btn icon="groups" v-on:click="this.store.offerListUpdateDialogActive = true"></q-btn>
-            </q-item-section>
-          </q-item>
-        </q-card>
-      </q-card-section>
+      <q-btn
+        class="full-width q-pa-md" no-caps label="Offers List Settings" icon-right="settings"
+        icon="groups" v-on:click="this.store.offerListUpdateDialogActive = true"></q-btn>
     </q-card>
     <q-file ref="fileInput" v-model="this.image" style="display: none" @update:model-value="selectNewFile"/>
     <q-file ref="fileInputSecond" v-model="this.imageSecond" style="display: none" @update:model-value="selectNewFileSecond"/>
