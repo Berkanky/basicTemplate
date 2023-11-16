@@ -70,7 +70,18 @@ export default {
   },
   methods:{
     removeNotify(data){
-
+      console.log(data)
+      ///:currentUserId/:selectedNotifyId/removeSelectedNotify
+      axios.put(`${this.store.baseUrl}/app/${this.store.firebaseData.uid}/${data.offerDetail._id}/removeSelectedNotify`)
+        .then(res => {
+          console.log(res)
+          this.offerList = this.offerList.filter(
+            object => object.offerDetail._id !== data.offerDetail._id
+          )
+        })
+        .catch(err => {
+          console.log(err)
+        })
     },
     getmynotifiesfunc(id){
       ///:currentUserId/getMyNotifies

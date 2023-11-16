@@ -97,7 +97,18 @@ app.get('/:currentUserId/getMyNotifies',async(req,res) => {
 
 app.put('/:currentUserId/:selectedNotifyId/removeSelectedNotify',async(req,res) => {
     const {currentUserId, selectedNotifyId} = req.params
-    
+    try{
+        const myacc = (await findme(currentUserId))
+        const mynotifies = await MyNotifies.findOneAndUpdate(
+          {userId : myacc._id},
+          {$pull : {offerList : {_id : selectedNotifyId}}}
+        ) 
+
+        res.status(200).json({myacc, mynotifies})
+
+    }catch(err){
+      res.status(500).json({message:'Internal Server Err'})
+    }
 })
 
 
