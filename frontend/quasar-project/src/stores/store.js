@@ -28,7 +28,7 @@ export const useCounterStore = defineStore('counter', {
     selectedAdvertDetailDB:{},
     offerListUpdateDialogActive:false,
     myNotifyDialogActive:false,
-    //deneme yorum
+    //deneme yorum fsdfsafdsfs
   }),
   getters: {
   },
